@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Ciclovia Rio</string>
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">Section 3</string>
+    <string name="app_name">CicloviaRio</string>
+    <string name="title_section1">Ciclovias</string>
+    <string name="title_section2">Bicicletas Públicas</string>
+    <string name="title_section3">Bicicletários</string>
+    <string name="title_section4">Lojas e Oficinas</string>
+    <string name="title_section5">Personalizar</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="action_example">Example action</string>
+    <string name="action_atualizar">Atualizar</string>
     <string name="action_settings">Settings</string>
+    
+    <array name="icons">
+        <item>@drawable/ic_ciclovias</item>
+        <item>@drawable/ic_bike_publicas</item>
+        <item>@drawable/ic_bicicletarios</item>
+        <item>@drawable/ic_lojas</item>
+        <item>@drawable/ic_personalizar</item>
+    </array>
 
 </resources>

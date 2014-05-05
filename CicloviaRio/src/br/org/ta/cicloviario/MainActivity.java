@@ -39,7 +39,7 @@ public class MainActivity extends ActionBarActivity implements
 		NavigationDrawerFragment.NavigationDrawerCallbacks {
 
 	/**
-	 * variáveis com a chave da api e o url dos servicos
+	 * variï¿½veis com a chave da api e o url dos servicos
 	 */
 	private static final String API_KEY = "AIzaSyCreptOWN3UAF4LdXLNt6XzMuPAbEciJH0";
 	private static final String VERIFY_SYNC_URL = "https://www.googleapis.com/drive/v2/files/1PJXmib36JCeDRrWiemp9v6dsNuL2MU4cD3kz8QY?key=" + API_KEY;
@@ -72,8 +72,12 @@ public class MainActivity extends ActionBarActivity implements
 		mNavigationDrawerFragment.setUp(R.id.navigation_drawer,
 				(DrawerLayout) findViewById(R.id.drawer_layout));
 		
-		//Chamando UpdatePoi
-		new UpdatePoi().execute();
+		//Chamando UpdatePoi, caso seja a primeira execucao do programa
+		String PREFS_NAME = "CicloviarioSettings";
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		String cacheModifiedDate = settings.getString("ModifiedDate", "NULL");
+		if (cacheModifiedDate == "NULL")
+			new UpdatePoi().execute();
 		//MapFragment mapa = (MapFragment) findViewById(R.id.map);
 	}
 
@@ -90,13 +94,13 @@ public class MainActivity extends ActionBarActivity implements
 	public void onSectionAttached(int number) {
 		switch (number) {
 		case 1:
-			mTitle = getString(R.string.title_section1);
+			///mTitle = getString(R.string.title_section1);
 			break;
 		case 2:
-			mTitle = getString(R.string.title_section2);
+			//mTitle = getString(R.string.title_section2);
 			break;
 		case 3:
-			mTitle = getString(R.string.title_section3);
+			//mTitle = getString(R.string.title_section3);
 			break;
 		}
 	}
@@ -134,14 +138,14 @@ public class MainActivity extends ActionBarActivity implements
 	}
 	
 	/**
-	 * Classe Async para atualização dos pontos de interesse via chamada HTTP
+	 * Classe Async para atualizaï¿½ï¿½o dos pontos de interesse via chamada HTTP
 	 */
 	 private class UpdatePoi extends AsyncTask<Void, Void, Void> {
 		 
 	     	@Override
 	        protected void onPreExecute() {
 	            super.onPreExecute();
-	            // Mostrar diálogo de progresso
+	            // Mostrar diï¿½logo de progresso
 	            pDialog = new ProgressDialog(MainActivity.this);
 	            pDialog.setMessage("Aguarde...");
 	            pDialog.setCancelable(false);
@@ -149,7 +153,7 @@ public class MainActivity extends ActionBarActivity implements
 	 
 	        }
 		 
-		 	//Tarefas para o app resolver em background como verificar se os pontos do cache estão atualizados e a atualização dos mesmos. 
+		 	//Tarefas para o app resolver em background como verificar se os pontos do cache estï¿½o atualizados e a atualizaï¿½ï¿½o dos mesmos. 
 			@Override
 			protected Void doInBackground(Void... arg0)  {
 				String PREFS_NAME = "CicloviarioSettings";
@@ -172,7 +176,7 @@ public class MainActivity extends ActionBarActivity implements
 				Log.d("Cache ModifiedDate", cacheModifiedDate);
 				
 						
-				//Se a data de modificado for diferente do que está no cache... ou seja, está mais atualizado na internet
+				//Se a data de modificado for diferente do que estï¿½ no cache... ou seja, estï¿½ mais atualizado na internet
 				if (!modifiedDate.equals(cacheModifiedDate)) {
 					//Baixando o JSON atualizado com os pontos de interesse (POI)
 					ServiceHandler shPoi = new ServiceHandler();
@@ -187,7 +191,7 @@ public class MainActivity extends ActionBarActivity implements
 						e.printStackTrace();
 					}
 					
-					//Atualizando o SharedPreferences com a nova data de modificação do JSON
+					//Atualizando o SharedPreferences com a nova data de modificaï¿½ï¿½o do JSON
 					SharedPreferences.Editor editor = settings.edit();
 					editor.putString("ModifiedDate", modifiedDate);
 					editor.commit();
@@ -198,7 +202,7 @@ public class MainActivity extends ActionBarActivity implements
 			@Override
 	        protected void onPostExecute(Void result) {
 	            super.onPostExecute(result);
-	            // Fechar o diálogo de progresso
+	            // Fechar o diï¿½logo de progresso
 	            if (pDialog.isShowing())
 	                pDialog.dismiss();
 	            /**
