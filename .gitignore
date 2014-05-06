@@ -1,2 +1,4 @@
 #Exclude this files
 CicloviaRio/project.properties
+CicloviaRio/bin/*
+CicloviaRio/gen/*
