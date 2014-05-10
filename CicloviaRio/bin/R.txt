@@ -445,6 +445,7 @@ int string common_google_play_services_update_text 0x7f070008
 int string common_google_play_services_update_title 0x7f070007
 int string common_signin_button_text 0x7f070012
 int string common_signin_button_text_long 0x7f070013
+int string dialog_updating 0x7f070032
 int string location_client_powered_by_google 0x7f07001a
 int string navigation_drawer_close 0x7f07002f
 int string navigation_drawer_open 0x7f07002e
@@ -453,6 +454,9 @@ int string title_section2 0x7f07002a
 int string title_section3 0x7f07002b
 int string title_section4 0x7f07002c
 int string title_section5 0x7f07002d
+int string toast_update_error 0x7f070035
+int string toast_update_success 0x7f070034
+int string toast_updated 0x7f070033
 int style AppBaseTheme 0x7f0b008b
 int style AppTheme 0x7f0b008c
 int style TextAppearance_AppCompat_Base_CompactMenu_Dialog 0x7f0b0063

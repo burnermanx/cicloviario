@@ -1560,6 +1560,7 @@ containing a value of this type.
         /**  Long form sign-in button text [CHAR LIMIT=30] 
          */
         public static final int common_signin_button_text_long=0x7f070013;
+        public static final int dialog_updating=0x7f070032;
         /**  Location client code resources (prefix with location_client) 
          */
         public static final int location_client_powered_by_google=0x7f07001a;
@@ -1570,6 +1571,9 @@ containing a value of this type.
         public static final int title_section3=0x7f07002b;
         public static final int title_section4=0x7f07002c;
         public static final int title_section5=0x7f07002d;
+        public static final int toast_update_error=0x7f070035;
+        public static final int toast_update_success=0x7f070034;
+        public static final int toast_updated=0x7f070033;
     }
     public static final class style {
         /** 

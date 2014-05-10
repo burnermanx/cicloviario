@@ -9,9 +9,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -34,17 +37,24 @@ import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity implements
 		NavigationDrawerFragment.NavigationDrawerCallbacks {
 
 	/**
-	 * variï¿½veis com a chave da api e o url dos servicos
+	 * variáveis com a chave da api e o url dos servicos
 	 */
-	private static final String API_KEY = "AIzaSyCreptOWN3UAF4LdXLNt6XzMuPAbEciJH0";
-	private static final String VERIFY_SYNC_URL = "https://www.googleapis.com/drive/v2/files/1PJXmib36JCeDRrWiemp9v6dsNuL2MU4cD3kz8QY?key=" + API_KEY;
-	private static final String POI_SYNC_URL = "https://www.googleapis.com/fusiontables/v1/query?sql=select%20*%20from%201PJXmib36JCeDRrWiemp9v6dsNuL2MU4cD3kz8QY&key=" + API_KEY;
+	private static final String API_KEY = "&key=AIzaSyBD4CmETkOmfBxadLcX1tac0SK6oFbij1E";
+	private static final String VERIFY_SYNC_URL = "https://www.googleapis.com/drive/v2/files/1PJXmib36JCeDRrWiemp9v6dsNuL2MU4cD3kz8QY" + API_KEY;
+	private static final String POI_SYNC_URL = "https://www.googleapis.com/fusiontables/v1/query?sql=select%20*%20from%201PJXmib36JCeDRrWiemp9v6dsNuL2MU4cD3kz8QY";
+	private static final double LAT_INICIAL = -22.93949546286523;
+	private static final double LON_INICIAL = -43.34304013427737;
+	private static final int ZOOM_INICIAL = 11;
+	private static final LatLng POS_INICIAL = new LatLng(LAT_INICIAL, LON_INICIAL);
+	private static final String tipoPontos[] = {"Ciclovia", "Ciclofaixa", "Faixa+Compartilhada", "Via+Compartilhada", "Via+Proibida", "Bicicleta+Publica", "Bicicletario", "Oficina+de+Bicicleta"};
 	private ProgressDialog pDialog;
+	private GoogleMap map;
 	
 	
 	/**
@@ -72,13 +82,23 @@ public class MainActivity extends ActionBarActivity implements
 		mNavigationDrawerFragment.setUp(R.id.navigation_drawer,
 				(DrawerLayout) findViewById(R.id.drawer_layout));
 		
-		//Chamando UpdatePoi, caso seja a primeira execucao do programa
-		String PREFS_NAME = "CicloviarioSettings";
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-		String cacheModifiedDate = settings.getString("ModifiedDate", "NULL");
-		if (cacheModifiedDate == "NULL")
-			new UpdatePoi().execute();
-		//MapFragment mapa = (MapFragment) findViewById(R.id.map);
+		
+		updatePoi(); //Chamando UpdatePoi
+		
+		SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+		map = mapFragment.getMap();
+		if (map != null)
+			map.moveCamera((CameraUpdateFactory.newLatLngZoom(POS_INICIAL, ZOOM_INICIAL)));
+	}
+	
+	//Metodo para chamar o UpdatePoi - Para uso em outros fragments
+	public void updatePoi() {
+		new UpdatePoi().execute();
+	}
+	
+	//Metodo para chamar Toasts
+	public void toastThis(String message) {
+		Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show(); //Mostra toast
 	}
 
 	@Override
@@ -94,13 +114,13 @@ public class MainActivity extends ActionBarActivity implements
 	public void onSectionAttached(int number) {
 		switch (number) {
 		case 1:
-			///mTitle = getString(R.string.title_section1);
+			mTitle = getString(R.string.title_section1);
 			break;
 		case 2:
-			//mTitle = getString(R.string.title_section2);
+			mTitle = getString(R.string.title_section2);
 			break;
 		case 3:
-			//mTitle = getString(R.string.title_section3);
+			mTitle = getString(R.string.title_section3);
 			break;
 		}
 	}
@@ -138,63 +158,74 @@ public class MainActivity extends ActionBarActivity implements
 	}
 	
 	/**
-	 * Classe Async para atualizaï¿½ï¿½o dos pontos de interesse via chamada HTTP
+	 * Classe Async para atualização dos pontos de interesse via chamada HTTP
 	 */
 	 private class UpdatePoi extends AsyncTask<Void, Void, Void> {
-		 
+		 	private int updateStatus = 0; //0 = erro na atualização; 1 = atualizado com sucesso; 2 = já atualizado
 	     	@Override
 	        protected void onPreExecute() {
 	            super.onPreExecute();
-	            // Mostrar diï¿½logo de progresso
+	            // Mostrar diálogo de progresso
 	            pDialog = new ProgressDialog(MainActivity.this);
-	            pDialog.setMessage("Aguarde...");
+	            pDialog.setMessage(getString(R.string.dialog_updating));
 	            pDialog.setCancelable(false);
 	            pDialog.show();
 	 
 	        }
 		 
-		 	//Tarefas para o app resolver em background como verificar se os pontos do cache estï¿½o atualizados e a atualizaï¿½ï¿½o dos mesmos. 
+		 	//Tarefas para o app resolver em background como verificar se os pontos do cache estão atualizados e a atualização dos mesmos. 
 			@Override
 			protected Void doInBackground(Void... arg0)  {
-				String PREFS_NAME = "CicloviarioSettings";
-					
+				final String PREFS_NAME = "CicloviarioSettings";	
 				String modifiedDate = "";
 				
 				ServiceHandler sh = new ServiceHandler();
 				String jsonUpdate = sh.makeServiceCall(VERIFY_SYNC_URL, 1);
+				//Comentando essa parte, para poder testar o resto
+				/*
 				try {
 					JSONObject dateObject = new JSONObject(jsonUpdate);
-					//Log.d("Meu JSON",jsonUpdate);
+					Log.d("Meu JSON",jsonUpdate);
 					modifiedDate = dateObject.getString("modifiedDate");
 					Log.d("ModifiedDate", modifiedDate);
 				}
 				catch (JSONException e) {
                     e.printStackTrace();
-				}
+                    updateStatus=0;
+                    return null;
+				} */
 				SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 				String cacheModifiedDate = settings.getString("ModifiedDate", "");
 				Log.d("Cache ModifiedDate", cacheModifiedDate);
+				modifiedDate = "999";
 				
-						
-				//Se a data de modificado for diferente do que estï¿½ no cache... ou seja, estï¿½ mais atualizado na internet
+				//Se a data de modificado for diferente do que está no cache... ou seja, está mais atualizado na internet
 				if (!modifiedDate.equals(cacheModifiedDate)) {
 					//Baixando o JSON atualizado com os pontos de interesse (POI)
 					ServiceHandler shPoi = new ServiceHandler();
 					try {
-						String FILENAME = "poicache";
-						String poiUpdate = shPoi.makeServiceCall(POI_SYNC_URL, 1);
-						FileOutputStream outputStream = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+						Log.d("Entrando no for", modifiedDate);
+						for (int i=0; i < tipoPontos.length; i++ ) {
+						Log.d("Gerando arquivo", tipoPontos[i]);
+						String filename = tipoPontos[i] + ".json";
+						String poiUpdate = shPoi.makeServiceCall(POI_SYNC_URL+"%20where%20col4%20in%20(%27"+tipoPontos[i]+"%27)"+API_KEY, 1);
+						FileOutputStream outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
 						outputStream.write(poiUpdate.getBytes());
 						outputStream.close();
+						}
 					}
 					catch (Exception e) {
 						e.printStackTrace();
 					}
 					
-					//Atualizando o SharedPreferences com a nova data de modificaï¿½ï¿½o do JSON
+					//Atualizando o SharedPreferences com a nova data de modificação do JSON
 					SharedPreferences.Editor editor = settings.edit();
 					editor.putString("ModifiedDate", modifiedDate);
 					editor.commit();
+					updateStatus = 1; //1 = sucesso
+				}
+				else {
+					updateStatus = 2; // 2 = ja atualizado
 				}
 					return null;
 			}
@@ -202,9 +233,23 @@ public class MainActivity extends ActionBarActivity implements
 			@Override
 	        protected void onPostExecute(Void result) {
 	            super.onPostExecute(result);
-	            // Fechar o diï¿½logo de progresso
+	            // Fechar o diálogo de progresso
 	            if (pDialog.isShowing())
 	                pDialog.dismiss();
+	            //Mostrar toast de acordo com a atualização feita
+	            switch (updateStatus) {
+	            case 0:
+	            	toastThis(getString(R.string.toast_update_error));
+	            break;
+	            case 1: 
+	            	toastThis(getString(R.string.toast_update_success));
+	            	break;
+	            case 2:
+	            	toastThis(getString(R.string.toast_updated));
+	            	break;
+	            default:
+	            	break;
+	            }
 	            /**
 	             * Se tudo der certo, tenho um sharedpreference e um arquivo com json no storage interno
 	             * */

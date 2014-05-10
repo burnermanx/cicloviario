@@ -250,6 +250,7 @@ public class NavigationDrawerFragment extends Fragment {
         }
 
         if (item.getItemId() == R.id.action_example) {
+        	((MainActivity)getActivity()).updatePoi();
             //new UpdatePoi().execute();
             return true;
         }
