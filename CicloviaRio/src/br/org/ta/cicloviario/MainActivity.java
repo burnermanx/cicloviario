@@ -1,8 +1,15 @@
 package br.org.ta.cicloviario;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
@@ -14,7 +21,12 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -24,6 +36,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -43,18 +59,19 @@ public class MainActivity extends ActionBarActivity implements
 		NavigationDrawerFragment.NavigationDrawerCallbacks {
 
 	/**
-	 * variáveis com a chave da api e o url dos servicos
+	 * variáveis com a chave da api, url dos servicos, e valores padrao
 	 */
 	private static final String API_KEY = "&key=AIzaSyBD4CmETkOmfBxadLcX1tac0SK6oFbij1E";
 	private static final String VERIFY_SYNC_URL = "https://www.googleapis.com/drive/v2/files/1PJXmib36JCeDRrWiemp9v6dsNuL2MU4cD3kz8QY" + API_KEY;
 	private static final String POI_SYNC_URL = "https://www.googleapis.com/fusiontables/v1/query?sql=select%20*%20from%201PJXmib36JCeDRrWiemp9v6dsNuL2MU4cD3kz8QY";
 	private static final double LAT_INICIAL = -22.93949546286523;
 	private static final double LON_INICIAL = -43.34304013427737;
-	private static final int ZOOM_INICIAL = 11;
+	private static final int ZOOM_INICIAL = 10;
 	private static final LatLng POS_INICIAL = new LatLng(LAT_INICIAL, LON_INICIAL);
 	private static final String tipoPontos[] = {"Ciclovia", "Ciclofaixa", "Faixa+Compartilhada", "Via+Compartilhada", "Via+Proibida", "Bicicleta+Publica", "Bicicletario", "Oficina+de+Bicicleta"};
 	private ProgressDialog pDialog;
 	private GoogleMap map;
+	private boolean locationEnabled = false;
 	
 	
 	/**
@@ -85,10 +102,62 @@ public class MainActivity extends ActionBarActivity implements
 		
 		updatePoi(); //Chamando UpdatePoi
 		
-		SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-		map = mapFragment.getMap();
-		if (map != null)
+	}
+	
+	//Manipulando o GoogleMaps no onResume, 2o metodo do ciclo de vida da Activity
+	protected void onResume() {
+		super.onResume();
+		SupportMapFragment mapFrag = (SupportMapFragment) getSupportFragmentManager()
+				.findFragmentById(R.id.map);
+
+				map = mapFrag.getMap();
+		if (map != null) {
 			map.moveCamera((CameraUpdateFactory.newLatLngZoom(POS_INICIAL, ZOOM_INICIAL)));
+		}
+	}
+	
+	//Resolvendo o problema do app crashear ao virar o dispositivo
+	@Override
+	public void onDestroy() {
+	    FragmentManager fm = getSupportFragmentManager();
+
+	    Fragment xmlFragment = fm.findFragmentById(R.id.map);
+	    if (xmlFragment != null) {
+	        fm.beginTransaction().remove(xmlFragment).commit();
+	    }
+
+	    super.onDestroy();
+	}
+	
+	//Metodo para testes
+	public void testeDraw() {
+		drawOnMap("Ciclovia");
+	}
+	
+	//Metodo para mostrar a localizacao atual
+	public void myLocation() {
+		if (!getLocationEnabled()) {
+			map.setMyLocationEnabled(true);
+			LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+			Criteria criteria = new Criteria();
+			String provider = locationManager.getBestProvider(criteria, true);
+			Location myLocation = locationManager.getLastKnownLocation(provider);
+			double latitude = myLocation.getLatitude();
+			double longitude = myLocation.getLongitude();
+			LatLng latLng = new LatLng(latitude, longitude);    
+			map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+			map.animateCamera(CameraUpdateFactory.zoomTo(15));
+			locationEnabled = true;
+		}
+		else {
+			map.setMyLocationEnabled(false);
+			locationEnabled = false;
+		}
+	}
+	
+	//Metodo para verificar se a localizacao por GPS esta ativada ou nao
+	public boolean getLocationEnabled() {
+		return locationEnabled;
 	}
 	
 	//Metodo para chamar o UpdatePoi - Para uso em outros fragments
@@ -100,7 +169,163 @@ public class MainActivity extends ActionBarActivity implements
 	public void toastThis(String message) {
 		Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show(); //Mostra toast
 	}
+	
+	//Metodo para a leitura dos arquivos .json
+	public String readJsonFile(String file) {
+		StringBuffer output = new StringBuffer();
+		try {
+			FileInputStream fIn = openFileInput(file);
+			InputStreamReader iSr = new InputStreamReader (fIn);
+			BufferedReader buffReader = new BufferedReader (iSr);
+			
+			String data = buffReader.readLine();
+			while (data != null) {
+				output.append(data);
+				data = buffReader.readLine();
+			}
+			iSr.close();
+			
+		}
+		catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+		return output.toString();
+	} 
+	
+	//Metodo para desenhar os pontos no mapa
+	public void drawOnMap(String ponto) {
+		JSONObject jsonFile = null; 
+		JSONArray array = null;
+		String description = null;
+		String name = null;
+		String cor = null;
+		String tipo = null;
+		String type = null;
+		String newColor = null;
 
+		double poLat = 0;
+		double poLng = 0;
+		
+		double[] plLat = {};
+		double[] plLng = {};
+
+		List<LatLng> llPoints = new ArrayList<>();
+		LatLng ll = null;
+		
+		try {
+			jsonFile = new JSONObject(readJsonFile(ponto+".json"));
+			array = jsonFile.getJSONArray("rows");
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			Log.d ("Falhei aqui", "primeiro exception");
+		}
+		//Em rows
+		for (int i=0; i < array.length(); i++) {
+			try {				
+				//Em rows
+				JSONArray row = (JSONArray) array.get(i);
+				String hDescription = row.getString(0);
+				description = hDescription.replaceAll("<br>","\n");
+				Log.d ("Acertei aqui descricao", description);
+				name = row.getString(1);
+				Log.d ("Acertei aqui nome", name);
+				cor = row.getString(3);
+				Log.d ("Acertei cor", cor);
+				tipo = row.getString(4);
+				Log.d ("Acertei tipo", tipo);
+				//We need to go deeper! 
+				JSONObject container = (JSONObject) row.get(2);
+				JSONObject geometry = (JSONObject) container.get("geometry");
+				type = geometry.getString("type");
+				Log.d ("Acertei type", type);
+				JSONArray arrayCoordinates = geometry.getJSONArray("coordinates");
+				//Reaching the limbo!
+				//Se eh um LineString, entao ele ainda tem um array dentro do array
+				if (type.equals("LineString")) {
+					llPoints.clear();
+					for (int l=0; l < arrayCoordinates.length(); l++) {
+						JSONArray rowCoordinates = (JSONArray) arrayCoordinates.get(l);
+						poLat =  rowCoordinates.getDouble(1);
+						Log.d ("Acertei lat", String.valueOf(poLat));
+						poLng = rowCoordinates.getDouble(0);
+						Log.d ("Acertei lgn", String.valueOf(poLng));
+						llPoints.add(new LatLng(poLat,poLng));
+					}
+				}
+				//Senao o proprio array ja tem os valores
+				if (type.equals("Point")){
+					poLat =  arrayCoordinates.getDouble(1);
+					Log.d ("Acertei lat", String.valueOf(poLat));
+					poLng = arrayCoordinates.getDouble(0);
+					Log.d ("Acertei lgn", String.valueOf(poLng));
+					ll = new LatLng(poLat,poLng);
+				}
+			}
+			catch (JSONException e) {
+				e.printStackTrace();
+				Log.d ("Falhei aqui", "segundo exception");
+			}
+			
+			
+			//Vamos por os pontos ou trajetos no mapa
+			if (type.equals("LineString")) {
+				
+				/*for (int p=0; p < plLat.length; p++) {
+					ll = new LatLng(plLat[p],plLng[p]);
+					llPoints.add(ll);
+				}*/
+				
+				map.addPolyline(new PolylineOptions()
+					.addAll(llPoints)
+						);
+			}
+			if (type.equals("Point")) {
+				map.addMarker(new MarkerOptions()
+					.position(ll)
+					.title(name)
+					.snippet(description)
+					.icon(BitmapDescriptorFactory.defaultMarker(colorizeMarks(cor)))
+						);
+			}
+			
+		}
+	}
+	
+	//Metodo para pegar as cores do JSON e transforma-la em cor para a classe BitmapDescriptorFactory
+	public float colorizeMarks(String color) {
+		float hue=255;
+		switch (color) {
+			case "green":
+				hue = (float) 120.0;
+				break;
+			case "33ff3373":
+				hue = (float) 120.0;
+				break;
+			case "blue":
+				hue = (float) 240.0;
+				break;
+			case "black":
+				hue = (float) 0.0;
+				break;
+			case "small_blue":
+				hue = (float) 210.0;
+				break;
+			case "small_red":
+				hue = (float) 300.0;
+				break;
+			case "small_yellow":
+				hue = (float) 30.0;
+				break;
+			case "cyan":
+				hue = (float) 180.0;
+				break;
+		}
+		return hue;
+	}
+
+	
+	
 	@Override
 	public void onNavigationDrawerItemSelected(int position) {
 		// update the main content by replacing fragments

@@ -249,11 +249,18 @@ public class NavigationDrawerFragment extends Fragment {
             return true;
         }
 
-        if (item.getItemId() == R.id.action_example) {
+        if (item.getItemId() == R.id.action_update) {
         	((MainActivity)getActivity()).updatePoi();
             //new UpdatePoi().execute();
             return true;
         }
+        
+         if (item.getItemId() == R.id.action_location) {
+        	((MainActivity)getActivity()).testeDraw();
+            //new UpdatePoi().execute();
+            return true;
+        } 
+
 
         return super.onOptionsItemSelected(item);
     }

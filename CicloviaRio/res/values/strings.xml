@@ -11,6 +11,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_atualizar">Atualizar</string>
     <string name="action_settings">Settings</string>
+    <string name="action_location">Localização</string>
     <string name="dialog_updating">Aguarde, atualizando</string>
     <string name="toast_updated">Pontos já atualizados</string>
     <string name="toast_update_success">Pontos atualizados com sucesso!</string>

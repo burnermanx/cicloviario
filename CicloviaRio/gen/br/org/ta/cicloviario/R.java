@@ -1253,6 +1253,7 @@ containing a value of this type.
         public static final int abc_textfield_searchview_holo_light=0x7f020054;
         public static final int abc_textfield_searchview_right_holo_dark=0x7f020055;
         public static final int abc_textfield_searchview_right_holo_light=0x7f020056;
+        public static final int actionbar_background=0x7f02007d;
         public static final int common_signin_btn_icon_dark=0x7f020057;
         public static final int common_signin_btn_icon_disabled_dark=0x7f020058;
         public static final int common_signin_btn_icon_disabled_focus_dark=0x7f020059;
@@ -1278,18 +1279,19 @@ containing a value of this type.
         public static final int common_signin_btn_text_pressed_dark=0x7f02006d;
         public static final int common_signin_btn_text_pressed_light=0x7f02006e;
         public static final int drawer_shadow=0x7f02006f;
-        public static final int ic_action_refresh=0x7f020070;
-        public static final int ic_bicicletarios=0x7f020071;
-        public static final int ic_bike_publicas=0x7f020072;
-        public static final int ic_ciclovias=0x7f020073;
-        public static final int ic_drawer=0x7f020074;
-        public static final int ic_launcher=0x7f020075;
-        public static final int ic_lojas=0x7f020076;
-        public static final int ic_personalizar=0x7f020077;
-        public static final int ic_plusone_medium_off_client=0x7f020078;
-        public static final int ic_plusone_small_off_client=0x7f020079;
-        public static final int ic_plusone_standard_off_client=0x7f02007a;
-        public static final int ic_plusone_tall_off_client=0x7f02007b;
+        public static final int ic_action_location_found=0x7f020070;
+        public static final int ic_action_refresh=0x7f020071;
+        public static final int ic_bicicletarios=0x7f020072;
+        public static final int ic_bike_publicas=0x7f020073;
+        public static final int ic_ciclovias=0x7f020074;
+        public static final int ic_drawer=0x7f020075;
+        public static final int ic_launcher=0x7f020076;
+        public static final int ic_lojas=0x7f020077;
+        public static final int ic_personalizar=0x7f020078;
+        public static final int ic_plusone_medium_off_client=0x7f020079;
+        public static final int ic_plusone_small_off_client=0x7f02007a;
+        public static final int ic_plusone_standard_off_client=0x7f02007b;
+        public static final int ic_plusone_tall_off_client=0x7f02007c;
     }
     public static final class id {
         public static final int action_bar=0x7f06001f;
@@ -1300,11 +1302,12 @@ containing a value of this type.
         public static final int action_bar_subtitle=0x7f060026;
         public static final int action_bar_title=0x7f060025;
         public static final int action_context_bar=0x7f060020;
-        public static final int action_example=0x7f060044;
+        public static final int action_location=0x7f060045;
         public static final int action_menu_divider=0x7f060019;
         public static final int action_menu_presenter=0x7f06001a;
         public static final int action_mode_close_button=0x7f060027;
         public static final int action_settings=0x7f060043;
+        public static final int action_update=0x7f060044;
         public static final int activity_chooser_view_content=0x7f060028;
         public static final int always=0x7f06000f;
         public static final int beginning=0x7f060014;
@@ -1464,6 +1467,7 @@ containing a value of this type.
          */
         public static final int abc_shareactionprovider_share_with_application=0x7f070026;
         public static final int action_atualizar=0x7f070030;
+        public static final int action_location=0x7f070032;
         public static final int action_settings=0x7f070031;
         public static final int app_name=0x7f070028;
         /**   Title for notification shown when GooglePlayServices needs to be
@@ -1560,7 +1564,7 @@ containing a value of this type.
         /**  Long form sign-in button text [CHAR LIMIT=30] 
          */
         public static final int common_signin_button_text_long=0x7f070013;
-        public static final int dialog_updating=0x7f070032;
+        public static final int dialog_updating=0x7f070033;
         /**  Location client code resources (prefix with location_client) 
          */
         public static final int location_client_powered_by_google=0x7f07001a;
@@ -1571,20 +1575,15 @@ containing a value of this type.
         public static final int title_section3=0x7f07002b;
         public static final int title_section4=0x7f07002c;
         public static final int title_section5=0x7f07002d;
-        public static final int toast_update_error=0x7f070035;
-        public static final int toast_update_success=0x7f070034;
-        public static final int toast_updated=0x7f070033;
+        public static final int toast_update_error=0x7f070036;
+        public static final int toast_update_success=0x7f070035;
+        public static final int toast_updated=0x7f070034;
     }
     public static final class style {
         /** 
         Base application theme, dependent on API level. This theme is replaced
         by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
     
-
-            Theme customizations available in newer API levels can go in
-            res/values-vXX/styles.xml, while customizations related to
-            backward-compatibility can go here.
-        
 
         Base application theme for API 11+. This theme completely replaces
         AppBaseTheme from res/values/styles.xml on API 11+ devices.
@@ -1595,7 +1594,6 @@ containing a value of this type.
         AppBaseTheme from BOTH res/values/styles.xml and
         res/values-v11/styles.xml on API 14+ devices.
     
- API 14 theme customizations can go here. 
 
         Base application theme for API 19. This theme completely replaces
         AppBaseTheme from BOTH res/values/styles.xml and
@@ -1607,6 +1605,7 @@ containing a value of this type.
  All customizations that are NOT specific to a particular API-level can go here. 
          */
         public static final int AppTheme=0x7f0b008c;
+        public static final int CiclorioActionBar=0x7f0b008d;
         /**  Mimic text appearance in select_dialog_item.xml 
          */
         public static final int TextAppearance_AppCompat_Base_CompactMenu_Dialog=0x7f0b0063;

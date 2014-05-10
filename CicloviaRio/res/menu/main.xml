@@ -4,9 +4,14 @@
     tools:context="br.org.ta.cicloviario.MainActivity" >
 
     <item
-        android:id="@+id/action_example"
+        android:id="@+id/action_update"
         android:icon="@drawable/ic_action_refresh"
         android:title="@string/action_atualizar"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/action_location"
+        android:icon="@drawable/ic_action_location_found"
+        android:title="@string/action_location"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/action_settings"
