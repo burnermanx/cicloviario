@@ -1014,7 +1014,15 @@ containing a value of this type.
         public static final int abc_split_action_bar_is_narrow=0x7f090002;
     }
     public static final class color {
-        public static final int abc_search_url_text_holo=0x7f05000d;
+        public static final int BLUE=0x7f05000f;
+        public static final int CYAN=0x7f050013;
+        public static final int GREEN=0x7f05000e;
+        public static final int LIGHT_BLUE=0x7f050010;
+        public static final int LIGHT_GREEN=0x7f05000d;
+        public static final int LIGHT_RED=0x7f050011;
+        public static final int RED=0x7f050014;
+        public static final int YELLOW=0x7f050012;
+        public static final int abc_search_url_text_holo=0x7f050015;
         public static final int abc_search_url_text_normal=0x7f05000a;
         public static final int abc_search_url_text_pressed=0x7f05000c;
         public static final int abc_search_url_text_selected=0x7f05000b;
@@ -1030,8 +1038,8 @@ containing a value of this type.
         public static final int common_signin_btn_light_text_disabled=0x7f050006;
         public static final int common_signin_btn_light_text_focused=0x7f050007;
         public static final int common_signin_btn_light_text_pressed=0x7f050005;
-        public static final int common_signin_btn_text_dark=0x7f05000e;
-        public static final int common_signin_btn_text_light=0x7f05000f;
+        public static final int common_signin_btn_text_dark=0x7f050016;
+        public static final int common_signin_btn_text_light=0x7f050017;
     }
     public static final class dimen {
         /**  Default height of an action bar. 
@@ -1302,12 +1310,10 @@ containing a value of this type.
         public static final int action_bar_subtitle=0x7f060026;
         public static final int action_bar_title=0x7f060025;
         public static final int action_context_bar=0x7f060020;
-        public static final int action_location=0x7f060045;
         public static final int action_menu_divider=0x7f060019;
         public static final int action_menu_presenter=0x7f06001a;
         public static final int action_mode_close_button=0x7f060027;
-        public static final int action_settings=0x7f060043;
-        public static final int action_update=0x7f060044;
+        public static final int action_update=0x7f060043;
         public static final int activity_chooser_view_content=0x7f060028;
         public static final int always=0x7f06000f;
         public static final int beginning=0x7f060014;

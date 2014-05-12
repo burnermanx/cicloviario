@@ -72,6 +72,8 @@ public class MainActivity extends ActionBarActivity implements
 	private ProgressDialog pDialog;
 	private GoogleMap map;
 	private boolean locationEnabled = false;
+	private boolean notLoaded = true;
+	private int antNav = 9;
 	
 	
 	/**
@@ -131,7 +133,7 @@ public class MainActivity extends ActionBarActivity implements
 	
 	//Metodo para testes
 	public void testeDraw() {
-		drawOnMap("Ciclovia");
+		navigationSelect(0);
 	}
 	
 	//Metodo para mostrar a localizacao atual
@@ -141,9 +143,9 @@ public class MainActivity extends ActionBarActivity implements
 			LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 			Criteria criteria = new Criteria();
 			String provider = locationManager.getBestProvider(criteria, true);
-			Location myLocation = locationManager.getLastKnownLocation(provider);
-			double latitude = myLocation.getLatitude();
-			double longitude = myLocation.getLongitude();
+			Location location = locationManager.getLastKnownLocation(provider);
+			double latitude = location.getLatitude();
+			double longitude = location.getLongitude();
 			LatLng latLng = new LatLng(latitude, longitude);    
 			map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
 			map.animateCamera(CameraUpdateFactory.zoomTo(15));
@@ -218,7 +220,7 @@ public class MainActivity extends ActionBarActivity implements
 		}
 		catch (JSONException e) {
 			e.printStackTrace();
-			Log.d ("Falhei aqui", "primeiro exception");
+			//Log.d ("Falhei aqui", "primeiro exception");
 		}
 		//Em rows
 		for (int i=0; i < array.length(); i++) {
@@ -227,18 +229,18 @@ public class MainActivity extends ActionBarActivity implements
 				JSONArray row = (JSONArray) array.get(i);
 				String hDescription = row.getString(0);
 				description = hDescription.replaceAll("<br>","\n");
-				Log.d ("Acertei aqui descricao", description);
+				//Log.d ("Acertei aqui descricao", description);
 				name = row.getString(1);
-				Log.d ("Acertei aqui nome", name);
+				//Log.d ("Acertei aqui nome", name);
 				cor = row.getString(3);
-				Log.d ("Acertei cor", cor);
+				//Log.d ("Acertei cor", cor);
 				tipo = row.getString(4);
-				Log.d ("Acertei tipo", tipo);
+				//Log.d ("Acertei tipo", tipo);
 				//We need to go deeper! 
 				JSONObject container = (JSONObject) row.get(2);
 				JSONObject geometry = (JSONObject) container.get("geometry");
 				type = geometry.getString("type");
-				Log.d ("Acertei type", type);
+				//Log.d ("Acertei type", type);
 				JSONArray arrayCoordinates = geometry.getJSONArray("coordinates");
 				//Reaching the limbo!
 				//Se eh um LineString, entao ele ainda tem um array dentro do array
@@ -247,38 +249,49 @@ public class MainActivity extends ActionBarActivity implements
 					for (int l=0; l < arrayCoordinates.length(); l++) {
 						JSONArray rowCoordinates = (JSONArray) arrayCoordinates.get(l);
 						poLat =  rowCoordinates.getDouble(1);
-						Log.d ("Acertei lat", String.valueOf(poLat));
+						//Log.d ("Acertei lat", String.valueOf(poLat));
 						poLng = rowCoordinates.getDouble(0);
-						Log.d ("Acertei lgn", String.valueOf(poLng));
+						//Log.d ("Acertei lgn", String.valueOf(poLng));
 						llPoints.add(new LatLng(poLat,poLng));
 					}
 				}
 				//Senao o proprio array ja tem os valores
 				if (type.equals("Point")){
 					poLat =  arrayCoordinates.getDouble(1);
-					Log.d ("Acertei lat", String.valueOf(poLat));
+					//Log.d ("Acertei lat", String.valueOf(poLat));
 					poLng = arrayCoordinates.getDouble(0);
-					Log.d ("Acertei lgn", String.valueOf(poLng));
+					//Log.d ("Acertei lgn", String.valueOf(poLng));
 					ll = new LatLng(poLat,poLng);
 				}
 			}
 			catch (JSONException e) {
 				e.printStackTrace();
-				Log.d ("Falhei aqui", "segundo exception");
+				//Log.d ("Falhei aqui", "segundo exception");
 			}
 			
 			
 			//Vamos por os pontos ou trajetos no mapa
 			if (type.equals("LineString")) {
-				
-				/*for (int p=0; p < plLat.length; p++) {
-					ll = new LatLng(plLat[p],plLng[p]);
-					llPoints.add(ll);
-				}*/
-				
 				map.addPolyline(new PolylineOptions()
 					.addAll(llPoints)
+					.width(4)
+					.geodesic(true)
+					.color(colorizeLines(cor))
+					);
+				map.addMarker(new MarkerOptions()
+					.position(llPoints.get(0))
+					.title(name)
+					.snippet(description)
+					.icon(BitmapDescriptorFactory.defaultMarker(colorizeMarks("small_blue")))
+					.alpha(0.7f)
 						);
+				map.addMarker(new MarkerOptions()
+				.position(llPoints.get(llPoints.size()-1))
+				.title(name)
+				.snippet(description)
+				.icon(BitmapDescriptorFactory.defaultMarker(colorizeMarks("black")))
+				.alpha(0.7f)
+					);
 			}
 			if (type.equals("Point")) {
 				map.addMarker(new MarkerOptions()
@@ -289,6 +302,29 @@ public class MainActivity extends ActionBarActivity implements
 						);
 			}
 			
+		}
+	}
+	//Método para receber o comando enviado do NavigationDrawer
+	public void navigationSelect(int choice) {
+		map.clear(); //Limpando o mapa antes de aplicar o novo mapa
+		switch (choice) {
+			case 0:
+				for (int i=0; i < 4; i++) {
+					drawOnMap(tipoPontos[i]);
+				}
+				break;
+			case 1:
+				drawOnMap(tipoPontos[5]);
+				break;
+			case 2:
+				drawOnMap(tipoPontos[6]);
+				break;
+			case 3:
+				drawOnMap(tipoPontos[7]);
+				break;
+			case 4:
+				toastThis("A implementar");
+				break;
 		}
 	}
 	
@@ -321,31 +357,80 @@ public class MainActivity extends ActionBarActivity implements
 				hue = (float) 180.0;
 				break;
 		}
-		return hue;
+			return hue;
 	}
-
+	//Metodo para pegar a cor RGB para dar cor as Polylines
+	public int colorizeLines(String color) {
+		int cor=0;
+		switch (color) {
+			case "green":
+				cor = getResources().getColor(R.color.GREEN);
+				break;
+			case "33ff3373":
+				cor = getResources().getColor(R.color.LIGHT_GREEN);
+				break;
+			case "blue":
+				cor = getResources().getColor(R.color.BLUE);
+				break;
+			case "black":
+				cor = getResources().getColor(R.color.RED);
+				break;
+			case "small_blue":
+				cor = getResources().getColor(R.color.LIGHT_BLUE);
+				break;
+			case "small_red":
+				cor = getResources().getColor(R.color.LIGHT_RED);
+				break;
+			case "small_yellow":
+				cor = getResources().getColor(R.color.YELLOW);
+				break;
+			case "cyan":
+				cor = getResources().getColor(R.color.CYAN);
+				break;
+		}
+			return cor;
+	}
+	
 	
 	
 	@Override
 	public void onNavigationDrawerItemSelected(int position) {
 		// update the main content by replacing fragments
 		FragmentManager fragmentManager = getSupportFragmentManager();
+		if (notLoaded) { 
 		fragmentManager
 				.beginTransaction()
 				.replace(R.id.container,
 						PlaceholderFragment.newInstance(position + 1)).commit();
+		notLoaded = false;
+		} else {
+			if (position != antNav) {
+				if (position == 0)
+					navigationSelect(0);
+				else
+					navigationSelect(position);
+				antNav = position; //evitar que ele recarregue os pontos caso escolha a mesma opção 
+			}
+		}
+		//navigationSelect(position);
 	}
 
 	public void onSectionAttached(int number) {
 		switch (number) {
 		case 1:
-			mTitle = getString(R.string.title_section1);
+			//mTitle = getString(R.string.title_section1);
 			break;
 		case 2:
 			mTitle = getString(R.string.title_section2);
 			break;
 		case 3:
 			mTitle = getString(R.string.title_section3);
+			break;
+		case 4:
+			mTitle = getString(R.string.title_section4);
+			break;
+		case 5:
+			mTitle = getString(R.string.title_section5);
 			break;
 		}
 	}
@@ -376,9 +461,9 @@ public class MainActivity extends ActionBarActivity implements
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		if (id == R.id.action_settings) {
+		/*if (id == R.id.action_settings) {
 			return true;
-		}
+		} */
 		return super.onOptionsItemSelected(item);
 	}
 	

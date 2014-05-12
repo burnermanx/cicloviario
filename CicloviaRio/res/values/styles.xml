@@ -1,6 +1,6 @@
 <resources>
 
-    <drawable name="actionbar_background">#FFCC00</drawable>
+    <drawable name="actionbar_background">#FECC09</drawable>
     <!--
         Base application theme, dependent on API level. This theme is replaced
         by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
@@ -24,7 +24,7 @@
     
     <style name="CiclorioActionBar"
            parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
-        <item name="android:background">@drawable/actionbar_background</item>
+        <item name="android:background">#FFCC00</item>
     </style>
 
 </resources>

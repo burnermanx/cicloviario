@@ -9,6 +9,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
@@ -133,6 +134,7 @@ public class NavigationDrawerFragment extends Fragment {
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
+        actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background));
 
         // ActionBarDrawerToggle ties together the the proper interactions
         // between the navigation drawer and the action bar app icon.
@@ -200,7 +202,7 @@ public class NavigationDrawerFragment extends Fragment {
         }
         if (mCallbacks != null) {
             mCallbacks.onNavigationDrawerItemSelected(position);
-        }
+        } 
     }
 
     @Override
@@ -251,15 +253,13 @@ public class NavigationDrawerFragment extends Fragment {
 
         if (item.getItemId() == R.id.action_update) {
         	((MainActivity)getActivity()).updatePoi();
-            //new UpdatePoi().execute();
             return true;
         }
-        
+        /*
          if (item.getItemId() == R.id.action_location) {
-        	((MainActivity)getActivity()).testeDraw();
-            //new UpdatePoi().execute();
-            return true;
-        } 
+        	((MainActivity)getActivity()).myLocation();
+            return true; 
+        } */
 
 
         return super.onOptionsItemSelected(item);
